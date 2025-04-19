@@ -1,0 +1,35 @@
+#ifndef CONST_H
+#define CONST_H
+
+#define TIMER_INTERVAL 40
+
+#define LOGGER_BAUD 115200
+
+// #define COMPASS_ADDRESS 0x36
+#define COMPASS_SCL_PIN 22
+#define COMPASS_SDA_PIN 21
+#define COMPASS_DIRECTION 0
+
+// Порт или пин в зависимости от выбранного метода
+#define MANUAL_PIN_PORT 12
+#define MANUAL_RX_PIN 10
+#define MANUAL_TX_PIN 11
+#define MANUAL_BAUD 115200
+#define MANUAL_MIN_FREQURENCE 0
+#define MANUAL_MAX_FREQURENCE 4095 // 1023
+
+#define MAVLINK_PORT 2
+#define MAVLINK_RX_PIN 16
+#define MAVLINK_TX_PIN 17
+#define MAVLINK_BAUD 115200
+
+#define ANTENNA_MAIN_PIN 34
+#define ANTENNA_MAIN_MIN_FREQURENCE 1435 //1440
+#define ANTENNA_MAIN_MAX_FREQURENCE 1575 //1550
+#define ANTENNA_MAIN_SPEED 30
+#define ANTENNA_MAIN_ACCEL 0.3
+
+//? Нужна ли начальная точка в среднем положение?
+// #define START_FREQURENCE (SERVO_MAX_FREQURENCE + SERVO_MIN_FREQURENCE) / 2
+
+#endif
