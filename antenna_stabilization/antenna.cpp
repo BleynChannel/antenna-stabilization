@@ -60,11 +60,7 @@ void Antenna::rotate(uint16_t angle) {
     uint16_t intensity = angle2Int(angle);
     logger.print("Intensity: ", intensity, "; ");
 
-    // mainServo.setTarget(intensity);
-
-    static uint16_t c = 600;
-    mainServo.writeMicroseconds(c++);
-    if (c > 2600) c = 600;
+    mainServo.setTarget(intensity);
 
     logger.print("Current: ", mainServo.getCurrent(), "; ");
 }
