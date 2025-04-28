@@ -18,8 +18,10 @@
 // 3. Потенциометр (#define MANUAL_POT)
 
 // #define MANUAL_SOFTWARE_SERIAL
-// #define MANUAL_HARDWARE_SERIAL
-#define MANUAL_POT
+#define MANUAL_HARDWARE_SERIAL
+// #define MANUAL_POT
+
+#define DEBUG
 
 class ManualControl {
 public:
@@ -40,6 +42,10 @@ public:
     
     uint16_t getAngle();
 private:
+    #if defined(MANUAL_SOFTWARE_SERIAL) || defined(MANUAL_HARDWARE_SERIAL)
+    uint16_t angle = 0;
+    #endif
+
     #if defined(MANUAL_SOFTWARE_SERIAL)
     EspSoftwareSerial serial;
     #elif defined(MANUAL_POT)

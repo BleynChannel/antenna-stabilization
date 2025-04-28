@@ -13,12 +13,12 @@
 
 class ServoController : public Smooth {
 public:
-    ServoController(int maxAngle = 180);
+    ServoController();
     using Smooth::attach;
     void attach(int pin);    
     void detach();
     void sendToDriver(uint16_t val);    
-    Servo _servo;            
 private:
+    Servo _servo;
 };
 #endif

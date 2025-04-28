@@ -105,5 +105,5 @@ void calculate() {
 }
 
 void applyCalculate() {
-  antenna.rotate(uint16_t(diffAngle + 180));
+  antenna.rotate(diffAngle);
 }

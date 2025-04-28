@@ -41,7 +41,7 @@ public:
     Antenna();
     void init(AntennaSetting mainSetting, AntennaSetting secondSetting);
     void tick();
-    void rotate(uint16_t angle);
+    void rotate(int16_t diffAngle);
 private:
     ServoController mainServo;
     // ServoSmooth secondServo;
