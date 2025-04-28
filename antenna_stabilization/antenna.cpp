@@ -33,7 +33,7 @@ Antenna::AntennaSetting Antenna::makeAntenna(uint8_t pin, uint16_t min, uint16_t
     return Antenna::AntennaSetting(pin, min, max, speed, accel, current);
 }
 
-Antenna::Antenna() : mainServo(360) /* Устанавливаем, что поворот главного серво 360 градусов */ {}
+Antenna::Antenna() {}
 
 void Antenna::init(AntennaSetting mainSetting, AntennaSetting secondSetting) {
     // Инициализация серво и установка текущего положения
@@ -55,11 +55,20 @@ void Antenna::tick() {
     // secondServo.tick();
 }
 
-void Antenna::rotate(uint16_t angle) {
-    // Вращение антенны на angle
-    uint16_t intensity = angle2Int(angle);
+//TODO: Позже заменить на _SERVO_DEADZONE
+#define ANTENNA_MAIN_LIMIT 4 // Ставим порог для создания плавного движения
+#define INVERT -1 // Необходимо для корректного движения сервомоторчика
+
+void Antenna::rotate(int16_t diffAngle) {
+    // Вычисление направления и интенсивности
+    uint16_t intensity = map(
+        constrain(diffAngle * INVERT, -ANTENNA_MAIN_LIMIT, ANTENNA_MAIN_LIMIT),
+        -ANTENNA_MAIN_LIMIT, ANTENNA_MAIN_LIMIT,
+        ANTENNA_MAIN_MIN_FREQURENCE, ANTENNA_MAIN_MAX_FREQURENCE);
+    
     logger.print("Intensity: ", intensity, "; ");
 
+    // Вращение антенны
     mainServo.setTarget(intensity);
 
     logger.print("Current: ", mainServo.getCurrent(), "; ");

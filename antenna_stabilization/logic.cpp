@@ -13,7 +13,7 @@ int16_t Logic::calculate(int16_t angle, int16_t carAngle, int16_t customAngle) {
         3. Внешний задаваемый угл
     */
 
-    int16_t diffAngle = angle + carAngle + customAngle;
+    int16_t diffAngle = angle - customAngle;
     diffAngle = (diffAngle + 540) % 360 - 180; // Нормализация угла
     return diffAngle;
 }

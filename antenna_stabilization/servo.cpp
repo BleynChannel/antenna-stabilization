@@ -1,7 +1,7 @@
 #include "servo.h"
 
-ServoController::ServoController(int maxAngle) {
-    _maxAngle = maxAngle;
+ServoController::ServoController() {
+    _maxAngle = 360;
     SS_DEADZONE = _SERVO_DEADZONE;
     SS_DEADZONE_SP = _SERVO_DEADZONE_SP;
 }

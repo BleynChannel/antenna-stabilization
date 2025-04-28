@@ -32,10 +32,12 @@ void ManualControl::init() {}
 uint16_t ManualControl::getAngle() {
     #if defined(MANUAL_SOFTWARE_SERIAL)
     // Получение угла из программного управления
-    return (uint16_t)serial.parseInt();
+    if (serial.available()) angle = (uint16_t)serial.parseInt();
+    return angle;
     #elif defined(MANUAL_HARDWARE_SERIAL)
     // Получение угла из аппаратного управления
-    return (uint16_t)Serial.parseInt();
+    if (Serial.available()) angle = (uint16_t)Serial.parseInt();
+    return angle;
     #elif defined(MANUAL_POT)
     // Получение угла из потенциометра
     return (uint16_t)map(analogRead(pin), MANUAL_MIN_FREQURENCE, MANUAL_MAX_FREQURENCE, 0, 360);
