@@ -46,10 +46,10 @@ MAVControl mavControl(MAVLINK_PORT);
 Antenna antenna;
 
 //* Данные
-int16_t compassAngle; // Угл компаса
-int16_t carAngle; // Угл транспорта
-int16_t customAngle; // Задаваемый угл
-int16_t diffAngle; // Разница углов
+uint16_t compassAngle; // Угл компаса. TODO: Убрать
+uint16_t carAngle; // Угл транспорта
+uint16_t customAngle; // Задаваемый угл
+uint16_t diffAngle; // Разница углов
 
 void setup() {
   logger.init(LOGGER_BAUD);
@@ -68,7 +68,7 @@ void setup() {
   // Инициализация MAVControl
   mavControl.init(MAVLINK_RX_PIN, MAVLINK_TX_PIN, MAVLINK_BAUD);
   // Инициализация антенны
-  antenna.init(Antenna::makeDefaultAntenna(), Antenna::makeDefaultAntenna());
+  antenna.init(Antenna::makeDefaultAntenna(), Antenna::makeDefaultAntenna(), &compass);
 }
 
 void loop() {
@@ -105,5 +105,5 @@ void calculate() {
 }
 
 void applyCalculate() {
-  antenna.rotate(diffAngle);
+  antenna.rotate(diffAngle, 0 /* Не используется */);
 }

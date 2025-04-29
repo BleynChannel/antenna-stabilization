@@ -5,7 +5,7 @@
 //     return int16_t(angle + 180) % 360 - 180;
 // }
 
-int16_t Logic::calculate(int16_t angle, int16_t carAngle, int16_t customAngle) {
+uint16_t Logic::calculate(uint16_t angle, uint16_t carAngle, uint16_t customAngle) {
     /*  TODO: Необходимо получать интенсивность сигнала и направление поворота
         Но перед получением, необходимо получать разницу углов поворота, относительно нескольких параметров:
         1. Угл компоса (или по другому "угл серво")
@@ -13,7 +13,9 @@ int16_t Logic::calculate(int16_t angle, int16_t carAngle, int16_t customAngle) {
         3. Внешний задаваемый угл
     */
 
-    int16_t diffAngle = angle - customAngle;
-    diffAngle = (diffAngle + 540) % 360 - 180; // Нормализация угла
-    return diffAngle;
+    // int16_t diffAngle = angle - customAngle;
+    // diffAngle = (diffAngle + 540) % 360 - 180; // Нормализация угла
+    // return diffAngle;
+
+    return customAngle;
 }
