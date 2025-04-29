@@ -26,10 +26,6 @@ public:
         uint16_t target;
     };
 public:
-    // Создание настройки
-    static AntennaSetting makeDefaultAntenna();
-    static AntennaSetting makeAntenna(uint8_t pin, uint16_t min, uint16_t max, uint16_t speed, uint16_t accel, uint16_t target = 0);
-
     Antenna();
     void init(AntennaSetting mainSetting, AntennaSetting secondSetting, Compass* compass);
     void tick();

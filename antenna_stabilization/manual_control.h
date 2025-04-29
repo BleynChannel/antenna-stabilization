@@ -10,7 +10,8 @@
 #define MANUAL_CONTROL_H
 
 #include <stdint.h>
-#include <HardwareSerial.h>
+#include <Arduino.h>
+// #include <SoftwareSerial.h>
 
 // Методы получения стороннего значения:
 // 1. SoftwareSerial (#define MANUAL_SOFTWARE_SERIAL)
@@ -36,7 +37,7 @@ public:
     void init();
     #endif
     #elif defined(MANUAL_POT)
-    ManualControl(uint8_t pin);
+    ManualControl(uint8_t pin, int32_t min, int32_t max);
     void init();
     #endif
     
@@ -47,9 +48,11 @@ private:
     #endif
 
     #if defined(MANUAL_SOFTWARE_SERIAL)
-    EspSoftwareSerial serial;
+    SoftwareSerial serial;
     #elif defined(MANUAL_POT)
     uint8_t pin;
+    int32_t min;
+    int32_t max;
     #endif
 };
 

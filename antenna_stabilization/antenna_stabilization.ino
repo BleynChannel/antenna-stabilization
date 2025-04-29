@@ -39,7 +39,7 @@ ManualControl manualControl;
 #elif defined(MANUAL_HARDWARE_SERIAL)
 ManualControl manualControl(MANUAL_PIN_PORT);
 #elif defined(MANUAL_POT)
-ManualControl manualControl(MANUAL_PIN_PORT);
+ManualControl manualControl(MANUAL_PIN_PORT, MANUAL_MIN_FREQURENCE, MANUAL_MAX_FREQURENCE);
 #endif
 
 MAVControl mavControl(MAVLINK_PORT);
@@ -57,18 +57,18 @@ void setup() {
   compass.init(COMPASS_SCL_PIN, COMPASS_SDA_PIN, COMPASS_DIRECTION);
   // Ручное управление
   
-  // #if defined(MANUAL_SOFTWARE_SERIAL)
-  // manualControl.init(MANUAL_BAUD);
-  // #elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
-  // manualControl.init(MANUAL_BAUD);
-  // #elif defined(MANUAL_POT) || (defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG))
+  #if defined(MANUAL_SOFTWARE_SERIAL)
+  manualControl.init(MANUAL_BAUD);
+  #elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
+  manualControl.init(MANUAL_BAUD);
+  #elif defined(MANUAL_POT) || (defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG))
   manualControl.init();
-  // #endif
+  #endif
 
   // Инициализация MAVControl
   mavControl.init(MAVLINK_RX_PIN, MAVLINK_TX_PIN, MAVLINK_BAUD);
   // Инициализация антенны
-  antenna.init(Antenna::makeDefaultAntenna(), Antenna::makeDefaultAntenna(), &compass);
+  antenna.init(makeMainServo(), makeMainServo(), &compass);
 }
 
 void loop() {
@@ -84,6 +84,10 @@ void loop() {
     applyCalculate();
     logger.println();
   }
+}
+
+Antenna::AntennaSetting makeMainServo() {
+  return Antenna::AntennaSetting(ANTENNA_MAIN_PIN, ANTENNA_MAIN_MIN_FREQURENCE, ANTENNA_MAIN_MAX_FREQURENCE, ANTENNA_MAIN_SPEED, ANTENNA_MAIN_ACCEL, 0);
 }
 
 void getParametres() {

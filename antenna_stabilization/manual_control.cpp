@@ -3,8 +3,6 @@
  * Автор: BleynChannel (Golovin Vladislav)
  */
 #include "manual_control.h"
-#include "const.h"
-#include "logger.h"
 
 #if defined(MANUAL_SOFTWARE_SERIAL)
 // Конструктор для программного управления
@@ -23,7 +21,7 @@ void ManualControl::init() {}
 #endif
 #elif defined(MANUAL_POT)
 // Конструктор для управления с помощью потенциометра
-ManualControl::ManualControl(uint8_t pin) : pin(pin) {}
+ManualControl::ManualControl(uint8_t pin, int32_t min, int32_t max) : pin(pin), min(min), max(max) {}
 // Инициализация управления с помощью потенциометра
 void ManualControl::init() {}
 #endif
@@ -40,8 +38,6 @@ uint16_t ManualControl::getAngle() {
     return angle;
     #elif defined(MANUAL_POT)
     // Получение угла из потенциометра
-    return (uint16_t)map(analogRead(pin), MANUAL_MIN_FREQURENCE, MANUAL_MAX_FREQURENCE, 0, 360); //TODO: Вывести мин/макс в отдельный параметр (избавиться от const.h)
+    return (uint16_t)map(analogRead(pin), min, max, 0, 360);
     #endif
-
-    // set_angle = (received_angle + 180) % 360;     // Инвертирование угла}
 }

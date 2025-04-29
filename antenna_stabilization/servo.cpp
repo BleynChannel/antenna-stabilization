@@ -6,6 +6,7 @@ ServoController::ServoController() {
     _maxAngle = 360; // Полный угол поворота
     SS_DEADZONE = _SERVO_DEADZONE;
     SS_DEADZONE_SP = _SERVO_DEADZONE_SP;
+    SS_LIMIT = _SERVO_LIMIT;
 }
 
 void ServoController::sendToDriver(uint16_t val) {
@@ -41,10 +42,10 @@ void ServoController::rotate(uint16_t angle) {
 
 
     // Другой вариант плавного поворота. На данный момент нестабильный
-    // float k = 1.0 / (_SERVO_ANGLE_LIMIT - _SERVO_DEADZONE);
+    // float k = 1.0 / (SS_LIMIT - SS_DEADZONE);
 
     // // Вычисляем значение после мёртвой зоны
-    // float value = max(0, abs(diff) - _SERVO_DEADZONE) * k;
+    // float value = max(0, abs(diff) - SS_DEADZONE) * k;
 
     // // Применяем знак и ограничение по максимуму/минимуму
     // value = constrain(((diff > 0) - (diff < 0)) * value, -1.0, 1.0) * INVERT;
