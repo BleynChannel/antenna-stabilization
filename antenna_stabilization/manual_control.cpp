@@ -40,7 +40,7 @@ uint16_t ManualControl::getAngle() {
     return angle;
     #elif defined(MANUAL_POT)
     // Получение угла из потенциометра
-    return (uint16_t)map(analogRead(pin), MANUAL_MIN_FREQURENCE, MANUAL_MAX_FREQURENCE, 0, 360);
+    return (uint16_t)map(analogRead(pin), MANUAL_MIN_FREQURENCE, MANUAL_MAX_FREQURENCE, 0, 360); //TODO: Вывести мин/макс в отдельный параметр (избавиться от const.h)
     #endif
 
     // set_angle = (received_angle + 180) % 360;     // Инвертирование угла}
