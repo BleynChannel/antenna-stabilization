@@ -43,7 +43,7 @@ public:
     template <typename... Args>
     void info(Args&&... args) {
         #ifdef DEBUG
-            println("[INFO]", args...);
+            println("[INFO] ", args...);
         #endif
     }
 
@@ -51,7 +51,7 @@ public:
     template <typename T>
     void warning(T value) {
         #ifdef DEBUG
-            println("[WARNING]", value);
+            println("[WARNING] ", value);
         #endif
     }
 
@@ -59,7 +59,7 @@ public:
     template <typename T>
     void error(T value) {
         #ifdef DEBUG
-            println("[ERROR]", value);
+            println("[ERROR] ", value);
         #endif
     }
 };

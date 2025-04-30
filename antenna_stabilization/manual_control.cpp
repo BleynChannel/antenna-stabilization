@@ -27,17 +27,30 @@ void ManualControl::init() {}
 #endif
 
 // Получение угла поворота
-uint16_t ManualControl::getAngle() {
+ManualControl::Data ManualControl::getData() {
     #if defined(MANUAL_SOFTWARE_SERIAL)
-    // Получение угла из программного управления
-    if (serial.available()) angle = (uint16_t)serial.parseInt();
-    return angle;
+    while (serial.available()) {
+        int inChar = serial.read();
     #elif defined(MANUAL_HARDWARE_SERIAL)
-    // Получение угла из аппаратного управления
-    if (Serial.available()) angle = (uint16_t)Serial.parseInt();
-    return angle;
-    #elif defined(MANUAL_POT)
-    // Получение угла из потенциометра
-    return (uint16_t)map(analogRead(pin), min, max, 0, 360);
+    while (Serial.available()) {
+        int inChar = Serial.read();
     #endif
+
+        if (inChar == ' ' || inChar == '\n') {
+            switch (index++) {
+                case 0:
+                    data.mainAngle = (uint16_t)inString.toInt();
+                    break;
+                case 1:
+                    data.secondAngle = (int16_t)inString.toInt();
+                    break;
+            }
+            inString = "";
+            if (inChar == '\n') index = 0;
+        } else {
+            inString += (char)inChar;
+        }
+    }
+
+    return data;
 }

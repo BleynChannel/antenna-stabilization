@@ -34,12 +34,10 @@ Compass compass;
 
 #if defined(MANUAL_SOFTWARE_SERIAL)
 ManualControl manualControl(MANUAL_RX_PIN, MANUAL_TX_PIN);
+#elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
+ManualControl manualControl(MANUAL_PIN_PORT);
 #elif defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG)
 ManualControl manualControl;
-#elif defined(MANUAL_HARDWARE_SERIAL)
-ManualControl manualControl(MANUAL_PIN_PORT);
-#elif defined(MANUAL_POT)
-ManualControl manualControl(MANUAL_PIN_PORT, MANUAL_MIN_FREQURENCE, MANUAL_MAX_FREQURENCE);
 #endif
 
 MAVControl mavControl(MAVLINK_PORT);
@@ -47,8 +45,8 @@ Antenna antenna;
 
 //* Данные
 uint16_t compassAngle; // Угл компаса. TODO: Убрать
-uint16_t carAngle; // Угл транспорта
-uint16_t customAngle; // Задаваемый угл
+uint16_t mainAngle; // Задаваемый угл для главного серво
+int16_t secondAngle; // Задаваемый угл для вспомогательного серво
 uint16_t diffAngle; // Разница углов
 
 void setup() {
@@ -61,14 +59,14 @@ void setup() {
   manualControl.init(MANUAL_BAUD);
   #elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
   manualControl.init(MANUAL_BAUD);
-  #elif defined(MANUAL_POT) || (defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG))
+  #elif defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG)
   manualControl.init();
   #endif
 
   // Инициализация MAVControl
   mavControl.init(MAVLINK_RX_PIN, MAVLINK_TX_PIN, MAVLINK_BAUD);
   // Инициализация антенны
-  antenna.init(makeMainServo(), makeMainServo(), &compass);
+  antenna.init(makeMainServo(), makeSecondServo(), &compass);
 }
 
 void loop() {
@@ -87,27 +85,45 @@ void loop() {
 }
 
 Antenna::AntennaSetting makeMainServo() {
-  return Antenna::AntennaSetting(ANTENNA_MAIN_PIN, ANTENNA_MAIN_MIN_FREQURENCE, ANTENNA_MAIN_MAX_FREQURENCE, ANTENNA_MAIN_SPEED, ANTENNA_MAIN_ACCEL, 0);
+  return Antenna::AntennaSetting(
+    ANTENNA_MAIN_PIN, 
+    ANTENNA_MAIN_MIN_FREQURENCE,
+    ANTENNA_MAIN_MAX_FREQURENCE, 
+    ANTENNA_MAIN_SPEED, 
+    ANTENNA_MAIN_ACCEL,
+    ANTENNA_MAIN_TARGET);
+}
+
+Antenna::SecondAntennaSetting makeSecondServo() {
+  return Antenna::SecondAntennaSetting(
+    ANTENNA_SECOND_PIN, 
+    ANTENNA_SECOND_MIN_FREQURENCE, 
+    ANTENNA_SECOND_MAX_FREQURENCE, 
+    ANTENNA_SECOND_SPEED, 
+    ANTENNA_SECOND_ACCEL, 
+    ANTENNA_SECOND_TARGET, 
+    ANTENNA_SECOND_MIN_ANGLE, 
+    ANTENNA_SECOND_MAX_ANGLE);
 }
 
 void getParametres() {
   // Угл компаса. 0..360
   compassAngle = compass.getAngle();
   logger.print("Magnetometr angle: ", compassAngle, "; ");
-  // Угл транспорта. 0..360
-  carAngle = mavControl.getVFRHud().heading;
-  logger.print("Car angle: ", carAngle, "; ");
   // Ручной ввод. 0..360
-  customAngle = manualControl.getAngle();
-  logger.print("Custom angle: ", customAngle, "; ");
+  mainAngle = manualControl.getData().mainAngle;
+  logger.print("Main angle: ", mainAngle, "; ");
+  // Ручной ввод. -180..180
+  secondAngle = manualControl.getData().secondAngle;
+  logger.print("Second angle: ", secondAngle, "; ");
 }
 
 void calculate() {
   // Расчёт разницы углов. -180..180
-  diffAngle = Logic::calculate(compassAngle, carAngle, customAngle);
+  diffAngle = Logic::calculate(compassAngle, mainAngle);
   logger.print("Diff Angle: ", diffAngle, "; ");
 }
 
 void applyCalculate() {
-  antenna.rotate(diffAngle, 0 /* Не используется */);
+  antenna.rotate(mainAngle, secondAngle);
 }

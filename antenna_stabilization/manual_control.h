@@ -16,15 +16,18 @@
 // Методы получения стороннего значения:
 // 1. SoftwareSerial (#define MANUAL_SOFTWARE_SERIAL)
 // 2. HardwareSerial (#define MANUAL_HARDWARE_SERIAL)
-// 3. Потенциометр (#define MANUAL_POT)
 
 // #define MANUAL_SOFTWARE_SERIAL
 #define MANUAL_HARDWARE_SERIAL
-// #define MANUAL_POT
 
 #define DEBUG
 
 class ManualControl {
+public:
+    struct Data {
+        uint16_t mainAngle = 0;
+        int16_t secondAngle = 0;
+    };
 public:
     #if defined(MANUAL_SOFTWARE_SERIAL)
     ManualControl(uint8_t rx, uint8_t tx);
@@ -36,23 +39,16 @@ public:
     #else
     void init();
     #endif
-    #elif defined(MANUAL_POT)
-    ManualControl(uint8_t pin, int32_t min, int32_t max);
-    void init();
     #endif
     
-    uint16_t getAngle();
+    Data getData();
 private:
-    #if defined(MANUAL_SOFTWARE_SERIAL) || defined(MANUAL_HARDWARE_SERIAL)
-    uint16_t angle = 0;
-    #endif
+    Data data;
+    String inString = "";
+    int index = 0;
 
     #if defined(MANUAL_SOFTWARE_SERIAL)
     SoftwareSerial serial;
-    #elif defined(MANUAL_POT)
-    uint8_t pin;
-    int32_t min;
-    int32_t max;
     #endif
 };
 
