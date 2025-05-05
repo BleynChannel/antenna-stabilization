@@ -13,9 +13,6 @@
 #define DEG_TO_RAD(x) (x * 0.01745329251) // x * PI / 180
 #define CZ(x) (x >= -0.0000001f && x <= 0.0000001f ? 0.0f : x) // Clear Zero
 
-using Eigen::Matrix3f;
-using Eigen::Vector3f;
-
 Logic::Vector Logic::anglesToVector(Angles angles) {
     float az = DEG_TO_RAD(angles.azimuth);
     float el = DEG_TO_RAD(angles.elevation);
