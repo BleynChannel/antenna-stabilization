@@ -1,6 +1,6 @@
 # Antenna Turn MCU Firmware
 
-![Project Cover](https://github.com/BleynChannel/antenna-stabilization/blob/main/assets/img/Antenna.png)
+![Project Cover](https://github.com/BleynChannel/antenna-stabilization/blob/master/assets/img/Antenna.png)
 
 [![English](https://img.shields.io/badge/English-blue)](README_EN.md)
 [![Russian](https://img.shields.io/badge/Русский-blue)](README.md)
