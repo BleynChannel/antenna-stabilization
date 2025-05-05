@@ -8,7 +8,6 @@
 
 #include "logic.h"
 #include <Arduino.h>
-#include <ArduinoEigen.h>
 
 #define RAD_TO_DEG(x) (x * 57.2957795131) // x * 180 / PI
 #define DEG_TO_RAD(x) (x * 0.01745329251) // x * PI / 180
@@ -77,27 +76,6 @@ Logic::Vector Logic::globalToLocal(Rotate rotateLocal, Vector targetGlobal) {
      * Rz(ϕ) =  [ sin(ϕ)   cos(ϕ)  0 ]
      *          [   0        0     1 ]
     */
-
-    // Matrix3f Rx;
-    // Rx << 1, 0, 0,
-    //        0, cp, -sp,
-    //        0, sp, cp;
-
-    // Matrix3f Ry;
-    // Ry << cy, 0, sy,
-    //        0, 1, 0,
-    //        -sy, 0, cy;
-
-    // Matrix3f Rz;
-    // Rz << cr, -sr, 0,
-    //        sr, cr, 0,
-    //        0, 0, 1;
-
-    // Matrix3f R = Rz * Ry * Rx;
-    
-    // Vector3f targetLocal = R.transpose() * Vector3f(Xg, Yg, Zg);
-    
-    // return Logic::Vector {targetLocal(0), targetLocal(1), targetLocal(2)};
 
     float Xl = cr*cy*Xg + sr*cy*Yg - sy*Zg;
     float Yl = -sr*cp*Xg + cr*sy*sp*Xg + cr*cp*Yg + sr*sy*sp*Yg + cy*sp*Zg;
