@@ -3,7 +3,7 @@
  *
  * Описание: Класс-заглушка для работы с MAVLink или пользовательским протоколом.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #ifndef MAV_CONTROL_H
 #define MAV_CONTROL_H

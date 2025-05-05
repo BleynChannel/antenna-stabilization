@@ -4,7 +4,7 @@
  * Описание: Класс-обёртка для работы с датчиком положения AS5600.
  * Предоставляет методы инициализации, получения интенсивности сигнала и угла.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #ifndef COMPASS_H
 #define COMPASS_H

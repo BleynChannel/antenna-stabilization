@@ -3,7 +3,7 @@
  *
  * Реализация функций для вычисления управляющего сигнала и нормализации углов для автостабилизации антенны.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 
 #include "logic.h"

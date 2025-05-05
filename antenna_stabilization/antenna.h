@@ -4,7 +4,7 @@
  * Описание: Класс для управления антенной (серво-приводом).
  * Предоставляет методы инициализации, вращения и преобразования углов/импульсов.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #ifndef ANTENNA_H
 #define ANTENNA_H

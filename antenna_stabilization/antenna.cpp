@@ -3,7 +3,7 @@
  *
  * Реализация методов класса Antenna для управления антенной (серво-приводом).
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #include "antenna.h"
 #include "compass.h"

@@ -3,7 +3,7 @@
  *
  * Реализация методов класса Logger для логирования и отладки через Serial-порт.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #include "logger.h"
 

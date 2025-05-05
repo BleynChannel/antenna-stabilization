@@ -5,7 +5,7 @@
                 Используются датчики положения (AS5600) и компас (QMC5883L).
                 Проект интегрируется с MissionPlanner.
  
-  Developer   : BleynChannel (Golovin Vladislav)
+  Developer   : Bleyn (Vladislav Golovin)
   C++ Version : 17
   Hardware    : ESP32, AS5600, SpeedyBye F405 V4, QMC5883L
   Software    : Arduino IDE / PlatformIO, MissionPlanner

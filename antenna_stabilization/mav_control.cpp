@@ -3,7 +3,7 @@
  *
  * Реализация методов класса MAVLink для обмена сообщениями.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #include "mav_control.h"
 #include "logger.h"
