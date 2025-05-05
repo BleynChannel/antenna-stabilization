@@ -67,7 +67,7 @@ public:
 private:
     void printImpl(float value) {
         #ifdef DEBUG
-            Serial.print(value, 5);
+            Serial.print(value, 3);
         #endif
     }
 

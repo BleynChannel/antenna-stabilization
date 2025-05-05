@@ -32,6 +32,7 @@ ManualControl::Data ManualControl::getData() {
     #endif
 
         if (inChar == ' ' || inChar == '\n') {
+            #if defined(MANUAL_VECTOR)
             switch (index++) {
                 case 0:
                     data.x = inString.toFloat();
@@ -43,6 +44,17 @@ ManualControl::Data ManualControl::getData() {
                     data.z = inString.toFloat();
                     break;
             }
+            #elif defined(MANUAL_ANGLES)
+            switch (index++) {
+                case 0:
+                    data.azimuth = (uint16_t)inString.toInt() % 360;
+                    break;
+                case 1:
+                    data.elevation = (int16_t)inString.toInt() % 90;
+                    break;
+            }
+            #endif
+
             inString = "";
             if (inChar == '\n') index = 0;
         } else {

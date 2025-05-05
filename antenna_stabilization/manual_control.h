@@ -17,17 +17,29 @@
 // 1. SoftwareSerial (#define MANUAL_SOFTWARE_SERIAL)
 // 2. HardwareSerial (#define MANUAL_HARDWARE_SERIAL)
 
+// Типы данных для получения
+// 1. Целевой вектор (x, y, z) (#define MANUAL_VECTOR)
+// 2. Азимут и наклон (azimuth, elevation) (#define MANUAL_ANGLES)
+
 // #define MANUAL_SOFTWARE_SERIAL
 #define MANUAL_HARDWARE_SERIAL
 
 #define DEBUG
 
+// #define MANUAL_VECTOR
+#define MANUAL_ANGLES
+
 class ManualControl {
 public:
     struct Data {
+        #if defined(MANUAL_VECTOR)
         float x = 0.0;
         float y = 1.0;
         float z = 0.0;
+        #elif defined(MANUAL_ANGLES)
+        uint16_t azimuth = 0;
+        int16_t elevation = 0;
+        #endif
     };
 public:
     #if defined(MANUAL_SOFTWARE_SERIAL)

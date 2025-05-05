@@ -45,6 +45,10 @@ Antenna antenna;
 
 //* Данные
 Logic::Vector targetVector;
+#if defined(MANUAL_ANGLES)
+Logic::Angles targetAngles;
+#endif
+
 Logic::Rotate carRotate;
 Logic::Angles antennaAngles;
 
@@ -108,9 +112,14 @@ Antenna::SecondAntennaSetting makeSecondServo() {
 void getParametres() {
   // Ручной ввод
   ManualControl::Data manualData = manualControl.getData();
+  #if defined(MANUAL_VECTOR)
   logger.print("Manual [X]: ", manualData.x, "; ");
   logger.print("Manual [Y]: ", manualData.y, "; ");
   logger.print("Manual [Z]: ", manualData.z, "; ");
+  #elif defined(MANUAL_ANGLES)
+  logger.print("Manual [Azimuth]: ", manualData.azimuth, "; ");
+  logger.print("Manual [Elevation]: ", manualData.elevation, "; ");
+  #endif
 
   // MAVLink
   mavlink_attitude_t carAttitude = mavControl.getAttitude();
@@ -118,21 +127,33 @@ void getParametres() {
   logger.print("Car MAV [Pitch]: ", carAttitude.pitch, "; ");
   logger.print("Car MAV [Yaw]: ", carAttitude.yaw, "; ");
 
+  //! Важно! Замена roll <-> yaw сделано для того, чтобы компенсировать особенность ArduPilot
   carRotate = Logic::Rotate {
-    carAttitude.roll,
+    carAttitude.yaw,
     carAttitude.pitch,
-    carAttitude.yaw
+    carAttitude.roll
   };
 
+  #if defined(MANUAL_VECTOR)
   targetVector = Logic::Vector {
     manualData.x,
     manualData.y,
     manualData.z
   };
+  #elif defined(MANUAL_ANGLES)
+  targetAngles = Logic::Angles {
+    manualData.azimuth,
+    manualData.elevation
+  };
+  #endif
 }
 
 void calculate() {
   // Вычисляем поворот антенны
+  #if defined(MANUAL_ANGLES)
+  targetVector = Logic::anglesToVector(targetAngles);
+  #endif
+
   Logic::Vector targetLocalVector = Logic::globalToLocal(carRotate, targetVector);
   logger.print("Antenna [X]: ", targetLocalVector.x, "; ");
   logger.print("Antenna [Y]: ", targetLocalVector.y, "; ");

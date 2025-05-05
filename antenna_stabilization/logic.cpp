@@ -8,9 +8,14 @@
 
 #include "logic.h"
 #include <Arduino.h>
+#include <ArduinoEigen.h>
 
 #define RAD_TO_DEG(x) (x * 57.2957795131) // x * 180 / PI
 #define DEG_TO_RAD(x) (x * 0.01745329251) // x * PI / 180
+#define CZ(x) (x >= -0.0000001f && x <= 0.0000001f ? 0.0f : x) // Clear Zero
+
+using Eigen::Matrix3f;
+using Eigen::Vector3f;
 
 Logic::Vector Logic::anglesToVector(Angles angles) {
     float az = DEG_TO_RAD(angles.azimuth);
@@ -25,12 +30,12 @@ Logic::Vector Logic::anglesToVector(Angles angles) {
 
 Logic::Angles Logic::vectorToAngles(Vector vector) {
     // Определяем азимут (вращение по горизонту)
-    float az = atan2(vector.x, vector.y);
+    float az = atan2(CZ(vector.x), CZ(vector.y)); //! Важно! Используется функция CZ, чтобы избежать проблему отрицательного нуля. Подробнее можно узнать здесь: https://stackoverflow.com/questions/47909048/what-will-be-atan2-output-for-both-x-and-y-as-0
     // Определяем угол возвышения (наклон вверх/вниз)
     float el = atan2(-vector.z, sqrt(vector.x*vector.x + vector.y*vector.y));
 
     return Logic::Angles {
-        (uint16_t)RAD_TO_DEG(az) % 360,
+        (uint16_t)(RAD_TO_DEG(az) + 360) % 360,
         (int16_t)RAD_TO_DEG(el)
     };
 }
@@ -68,13 +73,35 @@ Logic::Vector Logic::globalToLocal(Rotate rotateLocal, Vector targetGlobal) {
      * Ry(ψ) =  [ 0       1     0   ]
      *          [ -sin(ψ) 0  cos(ψ) ]
      * 
-     *          [ cos(ϕ)   sin(ϕ)  0 ]
-     * Rz(ϕ) =  [ -sin(ϕ)  cos(ϕ)  0 ]
+     *          [ cos(ϕ)  -sin(ϕ)  0 ]
+     * Rz(ϕ) =  [ sin(ϕ)   cos(ϕ)  0 ]
      *          [   0        0     1 ]
     */
-    float Xl =  cp * cy * Xg + cp * sy * Yg - sp * Zg;
-    float Yl = (sr * sp * cy - cr * sy) * Xg + (sr * sp * sy + cr * cy) * Yg + cp * sr * Zg;
-    float Zl = (cr * sp * cy + sr * sy) * Xg + (cr * sp * sy - sr * cy) * Yg + cp * cr * Zg;
+
+    // Matrix3f Rx;
+    // Rx << 1, 0, 0,
+    //        0, cp, -sp,
+    //        0, sp, cp;
+
+    // Matrix3f Ry;
+    // Ry << cy, 0, sy,
+    //        0, 1, 0,
+    //        -sy, 0, cy;
+
+    // Matrix3f Rz;
+    // Rz << cr, -sr, 0,
+    //        sr, cr, 0,
+    //        0, 0, 1;
+
+    // Matrix3f R = Rz * Ry * Rx;
+    
+    // Vector3f targetLocal = R.transpose() * Vector3f(Xg, Yg, Zg);
+    
+    // return Logic::Vector {targetLocal(0), targetLocal(1), targetLocal(2)};
+
+    float Xl = cr*cy*Xg + sr*cy*Yg - sy*Zg;
+    float Yl = -sr*cp*Xg + cr*sy*sp*Xg + cr*cp*Yg + sr*sy*sp*Yg + cy*sp*Zg;
+    float Zl = sr*sp*Xg + cr*sy*cp*Xg - cr*sp*Yg + sr*sy*cp*Yg + cy*cp*Zg;
 
     return Logic::Vector {Xl, Yl, Zl};
 }
