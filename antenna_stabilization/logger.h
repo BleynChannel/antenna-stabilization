@@ -5,7 +5,7 @@
  * Предоставляет методы для печати сообщений разного уровня (info, warning, error),
  * а также универсальные print/println с поддержкой произвольного количества аргументов.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #ifndef LOGGER_H
 #define LOGGER_H

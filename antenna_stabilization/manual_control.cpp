@@ -1,6 +1,6 @@
 /*
  * ManualControl class implementation
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #include "manual_control.h"
 

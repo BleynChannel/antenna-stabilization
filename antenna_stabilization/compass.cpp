@@ -3,7 +3,7 @@
  *
  * Реализация методов класса Compass для работы с датчиком AS5600.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #include "compass.h"
 #include "logger.h"

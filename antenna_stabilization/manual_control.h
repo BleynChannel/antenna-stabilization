@@ -4,7 +4,7 @@
  * Описание: Класс для ручного управления антенной или устройством.
  * Предоставляет методы инициализации и получения значения угла.
  *
- * Автор: BleynChannel (Golovin Vladislav)
+ * Автор: Bleyn (Vladislav Golovin)
  */
 #ifndef MANUAL_CONTROL_H
 #define MANUAL_CONTROL_H
