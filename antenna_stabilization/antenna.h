@@ -22,22 +22,31 @@ public:
         uint16_t min;
         uint16_t max;
         uint16_t speed;
-        uint16_t accel;
+        float accel;
         uint16_t target;
     };
-public:
-    // Создание настройки
-    static AntennaSetting makeDefaultAntenna();
-    static AntennaSetting makeAntenna(uint8_t pin, uint16_t min, uint16_t max, uint16_t speed, uint16_t accel, uint16_t target = 0);
 
+    struct SecondAntennaSetting {
+        uint8_t pin;
+        uint16_t min;
+        uint16_t max;
+        uint16_t speed;
+        float accel;
+        uint16_t target;
+        int16_t minAngle;
+        int16_t maxAngle;
+    };
+public:
     Antenna();
-    void init(AntennaSetting mainSetting, AntennaSetting secondSetting, Compass* compass);
+    void init(AntennaSetting mainSetting, SecondAntennaSetting secondSetting, Compass* compass);
     void tick();
-    void rotate(uint16_t mainAngle, uint16_t secondAngle); //TODO: Следующим шагом будет отправлять вектор направления антенны (x,y,z)
+    void rotate(uint16_t azimuth, int16_t elevation);
 private:
-    ServoController mainServo;
-    // ServoSmooth secondServo;
     Compass *compass;
+    ServoController mainServo;
+    ServoSmooth secondServo;
+    int16_t secondMinAngle;
+    int16_t secondMaxAngle;
 };
 
 #endif

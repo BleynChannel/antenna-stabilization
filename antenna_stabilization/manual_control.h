@@ -10,20 +10,37 @@
 #define MANUAL_CONTROL_H
 
 #include <stdint.h>
-#include <HardwareSerial.h>
+#include <Arduino.h>
+// #include <SoftwareSerial.h>
 
 // Методы получения стороннего значения:
 // 1. SoftwareSerial (#define MANUAL_SOFTWARE_SERIAL)
 // 2. HardwareSerial (#define MANUAL_HARDWARE_SERIAL)
-// 3. Потенциометр (#define MANUAL_POT)
+
+// Типы данных для получения
+// 1. Целевой вектор (x, y, z) (#define MANUAL_VECTOR)
+// 2. Азимут и наклон (azimuth, elevation) (#define MANUAL_ANGLES)
 
 // #define MANUAL_SOFTWARE_SERIAL
 #define MANUAL_HARDWARE_SERIAL
-// #define MANUAL_POT
 
 #define DEBUG
 
+// #define MANUAL_VECTOR
+#define MANUAL_ANGLES
+
 class ManualControl {
+public:
+    struct Data {
+        #if defined(MANUAL_VECTOR)
+        float x = 0.0;
+        float y = 1.0;
+        float z = 0.0;
+        #elif defined(MANUAL_ANGLES)
+        uint16_t azimuth = 0;
+        int16_t elevation = 0;
+        #endif
+    };
 public:
     #if defined(MANUAL_SOFTWARE_SERIAL)
     ManualControl(uint8_t rx, uint8_t tx);
@@ -35,21 +52,16 @@ public:
     #else
     void init();
     #endif
-    #elif defined(MANUAL_POT)
-    ManualControl(uint8_t pin);
-    void init();
     #endif
     
-    uint16_t getAngle();
+    Data getData();
 private:
-    #if defined(MANUAL_SOFTWARE_SERIAL) || defined(MANUAL_HARDWARE_SERIAL)
-    uint16_t angle = 0;
-    #endif
+    Data data;
+    String inString = "";
+    int index = 0;
 
     #if defined(MANUAL_SOFTWARE_SERIAL)
-    EspSoftwareSerial serial;
-    #elif defined(MANUAL_POT)
-    uint8_t pin;
+    SoftwareSerial serial;
     #endif
 };
 

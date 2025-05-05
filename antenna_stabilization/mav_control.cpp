@@ -120,8 +120,8 @@ void MAVControl::receiveData() {
                 mavlink_msg_vfr_hud_decode(&msg, &vfrHud);
                 break;
             
-            case MAVLINK_MSG_ID_ALTITUDE:
-                mavlink_msg_altitude_decode(&msg, &altitude);
+            case MAVLINK_MSG_ID_ATTITUDE:
+                mavlink_msg_attitude_decode(&msg, &attitude);
                 break;
             
             default:
@@ -135,6 +135,6 @@ mavlink_vfr_hud_t MAVControl::getVFRHud() {
     return vfrHud;
 }
 
-mavlink_altitude_t MAVControl::getAltitude() {
-    return altitude;
+mavlink_attitude_t MAVControl::getAttitude() {
+    return attitude;
 }

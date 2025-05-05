@@ -34,22 +34,23 @@ Compass compass;
 
 #if defined(MANUAL_SOFTWARE_SERIAL)
 ManualControl manualControl(MANUAL_RX_PIN, MANUAL_TX_PIN);
+#elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
+ManualControl manualControl;
 #elif defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG)
 ManualControl manualControl;
-#elif defined(MANUAL_HARDWARE_SERIAL)
-ManualControl manualControl(MANUAL_PIN_PORT);
-#elif defined(MANUAL_POT)
-ManualControl manualControl(MANUAL_PIN_PORT);
 #endif
 
 MAVControl mavControl(MAVLINK_PORT);
 Antenna antenna;
 
 //* Данные
-uint16_t compassAngle; // Угл компаса. TODO: Убрать
-uint16_t carAngle; // Угл транспорта
-uint16_t customAngle; // Задаваемый угл
-uint16_t diffAngle; // Разница углов
+Logic::Vector targetVector;
+#if defined(MANUAL_ANGLES)
+Logic::Angles targetAngles;
+#endif
+
+Logic::Rotate carRotate;
+Logic::Angles antennaAngles;
 
 void setup() {
   logger.init(LOGGER_BAUD);
@@ -57,18 +58,18 @@ void setup() {
   compass.init(COMPASS_SCL_PIN, COMPASS_SDA_PIN, COMPASS_DIRECTION);
   // Ручное управление
   
-  // #if defined(MANUAL_SOFTWARE_SERIAL)
-  // manualControl.init(MANUAL_BAUD);
-  // #elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
-  // manualControl.init(MANUAL_BAUD);
-  // #elif defined(MANUAL_POT) || (defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG))
+  #if defined(MANUAL_SOFTWARE_SERIAL)
+  manualControl.init(MANUAL_BAUD);
+  #elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
+  manualControl.init(MANUAL_BAUD);
+  #elif defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG)
   manualControl.init();
-  // #endif
+  #endif
 
   // Инициализация MAVControl
   mavControl.init(MAVLINK_RX_PIN, MAVLINK_TX_PIN, MAVLINK_BAUD);
   // Инициализация антенны
-  antenna.init(Antenna::makeDefaultAntenna(), Antenna::makeDefaultAntenna(), &compass);
+  antenna.init(makeMainServo(), makeSecondServo(), &compass);
 }
 
 void loop() {
@@ -86,24 +87,84 @@ void loop() {
   }
 }
 
+Antenna::AntennaSetting makeMainServo() {
+  return Antenna::AntennaSetting(
+    ANTENNA_MAIN_PIN, 
+    ANTENNA_MAIN_MIN_FREQURENCE,
+    ANTENNA_MAIN_MAX_FREQURENCE, 
+    ANTENNA_MAIN_SPEED, 
+    ANTENNA_MAIN_ACCEL,
+    ANTENNA_MAIN_TARGET);
+}
+
+Antenna::SecondAntennaSetting makeSecondServo() {
+  return Antenna::SecondAntennaSetting(
+    ANTENNA_SECOND_PIN, 
+    ANTENNA_SECOND_MIN_FREQURENCE, 
+    ANTENNA_SECOND_MAX_FREQURENCE, 
+    ANTENNA_SECOND_SPEED, 
+    ANTENNA_SECOND_ACCEL, 
+    ANTENNA_SECOND_TARGET, 
+    ANTENNA_SECOND_MIN_ANGLE, 
+    ANTENNA_SECOND_MAX_ANGLE);
+}
+
 void getParametres() {
-  // Угл компаса. 0..360
-  compassAngle = compass.getAngle();
-  logger.print("Magnetometr angle: ", compassAngle, "; ");
-  // Угл транспорта. 0..360
-  carAngle = mavControl.getVFRHud().heading;
-  logger.print("Car angle: ", carAngle, "; ");
-  // Ручной ввод. 0..360
-  customAngle = manualControl.getAngle();
-  logger.print("Custom angle: ", customAngle, "; ");
+  // Ручной ввод
+  ManualControl::Data manualData = manualControl.getData();
+  #if defined(MANUAL_VECTOR)
+  logger.print("Manual [X]: ", manualData.x, "; ");
+  logger.print("Manual [Y]: ", manualData.y, "; ");
+  logger.print("Manual [Z]: ", manualData.z, "; ");
+  #elif defined(MANUAL_ANGLES)
+  logger.print("Manual [Azimuth]: ", manualData.azimuth, "; ");
+  logger.print("Manual [Elevation]: ", manualData.elevation, "; ");
+  #endif
+
+  // MAVLink
+  mavlink_attitude_t carAttitude = mavControl.getAttitude();
+  logger.print("Car MAV [Roll]: ", carAttitude.roll, "; ");
+  logger.print("Car MAV [Pitch]: ", carAttitude.pitch, "; ");
+  logger.print("Car MAV [Yaw]: ", carAttitude.yaw, "; ");
+
+  //! Важно! Замена roll <-> yaw сделано для того, чтобы компенсировать особенность ArduPilot
+  carRotate = Logic::Rotate {
+    carAttitude.yaw,
+    carAttitude.pitch,
+    carAttitude.roll
+  };
+
+  #if defined(MANUAL_VECTOR)
+  targetVector = Logic::Vector {
+    manualData.x,
+    manualData.y,
+    manualData.z
+  };
+  #elif defined(MANUAL_ANGLES)
+  targetAngles = Logic::Angles {
+    manualData.azimuth,
+    manualData.elevation
+  };
+  #endif
 }
 
 void calculate() {
-  // Расчёт разницы углов. -180..180
-  diffAngle = Logic::calculate(compassAngle, carAngle, customAngle);
-  logger.print("Diff Angle: ", diffAngle, "; ");
+  // Вычисляем поворот антенны
+  #if defined(MANUAL_ANGLES)
+  targetVector = Logic::anglesToVector(targetAngles);
+  #endif
+
+  Logic::Vector targetLocalVector = Logic::globalToLocal(carRotate, targetVector);
+  logger.print("Antenna [X]: ", targetLocalVector.x, "; ");
+  logger.print("Antenna [Y]: ", targetLocalVector.y, "; ");
+  logger.print("Antenna [Z]: ", targetLocalVector.z, "; ");
+  
+  // Получаем углы поворота из локального вектора
+  antennaAngles = Logic::vectorToAngles(targetLocalVector);
+  logger.print("Antenna [Azimuth]: ", antennaAngles.azimuth, "; ");
+  logger.print("Antenna [Elevation]: ", antennaAngles.elevation, "; ");
 }
 
 void applyCalculate() {
-  antenna.rotate(diffAngle, 0 /* Не используется */);
+  antenna.rotate(antennaAngles.azimuth, antennaAngles.elevation);
 }

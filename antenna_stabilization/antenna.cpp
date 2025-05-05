@@ -7,29 +7,27 @@
  */
 #include "antenna.h"
 #include "compass.h"
-#include "logic.h"
-#include "servo.h"
-#include "const.h"
 #include "logger.h"
-
-//TODO: Вынести функцию выше (избавиться от const.h)
-Antenna::AntennaSetting Antenna::makeDefaultAntenna() {
-    return Antenna::AntennaSetting(ANTENNA_MAIN_PIN, ANTENNA_MAIN_MIN_FREQURENCE, ANTENNA_MAIN_MAX_FREQURENCE, ANTENNA_MAIN_SPEED, ANTENNA_MAIN_ACCEL, 0);
-}
-
-Antenna::AntennaSetting Antenna::makeAntenna(uint8_t pin, uint16_t min, uint16_t max, uint16_t speed, uint16_t accel, uint16_t target) {
-    return Antenna::AntennaSetting(pin, min, max, speed, accel, target);
-}
 
 Antenna::Antenna() {}
 
-void Antenna::init(AntennaSetting mainSetting, AntennaSetting secondSetting, Compass* compass) {
+void Antenna::init(AntennaSetting mainSetting, SecondAntennaSetting secondSetting, Compass* compass) {
     // Инициализация серво и установка текущего положения
     mainServo.setSpeed(mainSetting.speed); // ограничить скорость
     mainServo.setAccel(mainSetting.accel); // установить ускорение (разгон и торможение)
     mainServo.attach(mainSetting.pin, mainSetting.min, mainSetting.max);
     mainServo.setCurrentAngle(mainSetting.target);
+    mainServo.setAutoDetach(false);
     // mainServo.smoothStart();
+
+    secondServo.setSpeed(secondSetting.speed); // ограничить скорость
+    secondServo.setAccel(secondSetting.accel); // установить ускорение (разгон и торможение)
+    secondServo.attach(secondSetting.pin, secondSetting.min, secondSetting.max, secondSetting.target);
+    secondServo.setCurrentDeg(90); // Жёстко устанавливаем начальный угол в середине поворота
+    secondServo.setMaxAngle(180); // Жёстко ограничиваем угол
+    secondMinAngle = secondSetting.minAngle;
+    secondMaxAngle = secondSetting.maxAngle;
+    // secondServo.smoothStart();
 
     // Инициализация компаса
     this->compass = compass;
@@ -41,13 +39,16 @@ void Antenna::tick() {
 
     // Обновление состояния серво
     mainServo.tick();
-    // secondServo.tick();
+    secondServo.tick();
 }
 
-void Antenna::rotate(uint16_t mainAngle, uint16_t secondAngle) {
+void Antenna::rotate(uint16_t azimuth, int16_t elevation) {
     // Вращение антенны
-    mainServo.rotate(mainAngle);
+    mainServo.rotate(azimuth);
+    secondServo.setTargetDeg(constrain(elevation, secondMinAngle, secondMaxAngle) + 90);
 
-    logger.print("Target: ", mainServo.getTarget(), "; ");
-    logger.print("Current: ", mainServo.getCurrent(), "; ");
+    logger.print("Target [main]: ", mainServo.getTarget(), "; ");
+    logger.print("Current [main]: ", mainServo.getCurrent(), "; ");
+    logger.print("Target [second]: ", secondServo.getTargetDeg(), "; ");
+    logger.print("Current [second]: ", secondServo.getCurrentDeg(), "; ");
 }
