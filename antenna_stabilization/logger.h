@@ -12,6 +12,8 @@
 
 #include <Arduino.h>
 #include <stdint.h>
+#include <iostream>
+#include <type_traits>
 
 #define DEBUG
 
@@ -24,42 +26,56 @@ public:
     
     // Универсальная печать (без переноса строки)
     template <typename... Args>
-    void print(Args&&... args) {
+    void print(Args... args) {
         #ifdef DEBUG
-            (Serial.print(args), ...);
+            (printImpl(args), ...);
         #endif
     }
 
     // Универсальная печать (с переносом строки)
     template <typename... Args>
-    void println(Args&&... args) {
+    void println(Args... args) {
         #ifdef DEBUG
-            (Serial.print(args), ...);
+            (printImpl(args), ...);
             Serial.println();
         #endif
     }
 
     // Печать информационного сообщения
     template <typename... Args>
-    void info(Args&&... args) {
+    void info(Args... args) {
         #ifdef DEBUG
             println("[INFO] ", args...);
         #endif
     }
 
     // Печать предупреждения
-    template <typename T>
-    void warning(T value) {
+    template <typename... Args>
+    void warning(Args... args) {
         #ifdef DEBUG
-            println("[WARNING] ", value);
+            println("[WARNING] ", args...);
         #endif
     }
 
     // Печать ошибки
-    template <typename T>
-    void error(T value) {
+    template <typename... Args>
+    void error(Args... args) {
         #ifdef DEBUG
-            println("[ERROR] ", value);
+            println("[ERROR] ", args...);
+        #endif
+    }
+private:
+    void printImpl(float value) {
+        #ifdef DEBUG
+            Serial.print(value, 5);
+        #endif
+    }
+
+    template <typename T>
+    typename std::enable_if<!std::is_same<T, float>::value>::type
+    printImpl(const T& value) {
+        #ifdef DEBUG
+            Serial.print(value);
         #endif
     }
 };

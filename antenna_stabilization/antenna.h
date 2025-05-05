@@ -40,7 +40,7 @@ public:
     Antenna();
     void init(AntennaSetting mainSetting, SecondAntennaSetting secondSetting, Compass* compass);
     void tick();
-    void rotate(uint16_t mainAngle, int16_t secondAngle); //TODO: Следующим шагом будет отправлять вектор направления антенны (x,y,z)
+    void rotate(uint16_t azimuth, int16_t elevation);
 private:
     Compass *compass;
     ServoController mainServo;

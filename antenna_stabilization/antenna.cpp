@@ -42,10 +42,10 @@ void Antenna::tick() {
     secondServo.tick();
 }
 
-void Antenna::rotate(uint16_t mainAngle, int16_t secondAngle) {
+void Antenna::rotate(uint16_t azimuth, int16_t elevation) {
     // Вращение антенны
-    mainServo.rotate(mainAngle);
-    secondServo.setTargetDeg(constrain(secondAngle, secondMinAngle, secondMaxAngle) + 90);
+    mainServo.rotate(azimuth);
+    secondServo.setTargetDeg(constrain(elevation, secondMinAngle, secondMaxAngle) + 90);
 
     logger.print("Target [main]: ", mainServo.getTarget(), "; ");
     logger.print("Current [main]: ", mainServo.getCurrent(), "; ");

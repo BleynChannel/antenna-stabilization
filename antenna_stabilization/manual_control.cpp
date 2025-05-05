@@ -19,11 +19,6 @@ void ManualControl::init(uint32_t baud) { Serial.begin(baud); }
 #else
 void ManualControl::init() {}
 #endif
-#elif defined(MANUAL_POT)
-// Конструктор для управления с помощью потенциометра
-ManualControl::ManualControl(uint8_t pin, int32_t min, int32_t max) : pin(pin), min(min), max(max) {}
-// Инициализация управления с помощью потенциометра
-void ManualControl::init() {}
 #endif
 
 // Получение угла поворота
@@ -39,10 +34,13 @@ ManualControl::Data ManualControl::getData() {
         if (inChar == ' ' || inChar == '\n') {
             switch (index++) {
                 case 0:
-                    data.mainAngle = (uint16_t)inString.toInt();
+                    data.x = inString.toFloat();
                     break;
                 case 1:
-                    data.secondAngle = (int16_t)inString.toInt();
+                    data.y = inString.toFloat();
+                    break;
+                case 2:
+                    data.z = inString.toFloat();
                     break;
             }
             inString = "";

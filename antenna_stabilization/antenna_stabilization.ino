@@ -35,7 +35,7 @@ Compass compass;
 #if defined(MANUAL_SOFTWARE_SERIAL)
 ManualControl manualControl(MANUAL_RX_PIN, MANUAL_TX_PIN);
 #elif defined(MANUAL_HARDWARE_SERIAL) && !defined(DEBUG)
-ManualControl manualControl(MANUAL_PIN_PORT);
+ManualControl manualControl;
 #elif defined(MANUAL_HARDWARE_SERIAL) && defined(DEBUG)
 ManualControl manualControl;
 #endif
@@ -44,10 +44,9 @@ MAVControl mavControl(MAVLINK_PORT);
 Antenna antenna;
 
 //* Данные
-uint16_t compassAngle; // Угл компаса. TODO: Убрать
-uint16_t mainAngle; // Задаваемый угл для главного серво
-int16_t secondAngle; // Задаваемый угл для вспомогательного серво
-uint16_t diffAngle; // Разница углов
+Logic::Vector targetVector;
+Logic::Rotate carRotate;
+Logic::Angles antennaAngles;
 
 void setup() {
   logger.init(LOGGER_BAUD);
@@ -107,23 +106,44 @@ Antenna::SecondAntennaSetting makeSecondServo() {
 }
 
 void getParametres() {
-  // Угл компаса. 0..360
-  compassAngle = compass.getAngle();
-  logger.print("Magnetometr angle: ", compassAngle, "; ");
-  // Ручной ввод. 0..360
-  mainAngle = manualControl.getData().mainAngle;
-  logger.print("Main angle: ", mainAngle, "; ");
-  // Ручной ввод. -180..180
-  secondAngle = manualControl.getData().secondAngle;
-  logger.print("Second angle: ", secondAngle, "; ");
+  // Ручной ввод
+  ManualControl::Data manualData = manualControl.getData();
+  logger.print("Manual [X]: ", manualData.x, "; ");
+  logger.print("Manual [Y]: ", manualData.y, "; ");
+  logger.print("Manual [Z]: ", manualData.z, "; ");
+
+  // MAVLink
+  mavlink_attitude_t carAttitude = mavControl.getAttitude();
+  logger.print("Car MAV [Roll]: ", carAttitude.roll, "; ");
+  logger.print("Car MAV [Pitch]: ", carAttitude.pitch, "; ");
+  logger.print("Car MAV [Yaw]: ", carAttitude.yaw, "; ");
+
+  carRotate = Logic::Rotate {
+    carAttitude.roll,
+    carAttitude.pitch,
+    carAttitude.yaw
+  };
+
+  targetVector = Logic::Vector {
+    manualData.x,
+    manualData.y,
+    manualData.z
+  };
 }
 
 void calculate() {
-  // Расчёт разницы углов. -180..180
-  diffAngle = Logic::calculate(compassAngle, mainAngle);
-  logger.print("Diff Angle: ", diffAngle, "; ");
+  // Вычисляем поворот антенны
+  Logic::Vector targetLocalVector = Logic::globalToLocal(carRotate, targetVector);
+  logger.print("Antenna [X]: ", targetLocalVector.x, "; ");
+  logger.print("Antenna [Y]: ", targetLocalVector.y, "; ");
+  logger.print("Antenna [Z]: ", targetLocalVector.z, "; ");
+  
+  // Получаем углы поворота из локального вектора
+  antennaAngles = Logic::vectorToAngles(targetLocalVector);
+  logger.print("Antenna [Azimuth]: ", antennaAngles.azimuth, "; ");
+  logger.print("Antenna [Elevation]: ", antennaAngles.elevation, "; ");
 }
 
 void applyCalculate() {
-  antenna.rotate(mainAngle, secondAngle);
+  antenna.rotate(antennaAngles.azimuth, antennaAngles.elevation);
 }

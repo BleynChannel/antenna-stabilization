@@ -19,7 +19,7 @@ public:
     void tick(uint32_t interval = 1000);
     
     mavlink_vfr_hud_t getVFRHud();
-    mavlink_altitude_t getAltitude();
+    mavlink_attitude_t getAttitude();
 private:
     // MAVLink functions
     void requestData();
@@ -33,7 +33,7 @@ private:
 
     // MAVLink Variables
     mavlink_vfr_hud_t vfrHud;
-    mavlink_altitude_t altitude;
+    mavlink_attitude_t attitude;
 
     // MAVLink config
     // int sysid;

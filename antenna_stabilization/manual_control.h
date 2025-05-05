@@ -25,8 +25,9 @@
 class ManualControl {
 public:
     struct Data {
-        uint16_t mainAngle = 0;
-        int16_t secondAngle = 0;
+        float x = 0.0;
+        float y = 1.0;
+        float z = 0.0;
     };
 public:
     #if defined(MANUAL_SOFTWARE_SERIAL)
