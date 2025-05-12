@@ -53,6 +53,7 @@ Logic::Rotate carRotate;
 Logic::Angles antennaAngles;
 
 void setup() {
+  delay(3000);  // Задержка 3 секунды при запуске
   logger.init(LOGGER_BAUD);
   // Инициализация компаса
   compass.init(COMPASS_SCL_PIN, COMPASS_SDA_PIN, COMPASS_DIRECTION);
